@@ -252,7 +252,7 @@ impl UdpSocket {
                 .map(|raw_socket| unsafe { std::net::UdpSocket::from_raw_socket(raw_socket) })
         }
 
-        #[cfg(target_os = "solid-asp3")]
+        #[cfg(target_os = "solid_asp3")]
         {
             use std::os::solid::io::{FromRawFd, IntoRawFd};
             self.io
@@ -1480,7 +1480,7 @@ mod sys {
     }
 }
 
-#[cfg(target_os = "solid-asp3")]
+#[cfg(target_os = "solid_asp3")]
 mod sys {
     use super::UdpSocket;
     use std::os::solid::prelude::*;

@@ -16,7 +16,7 @@
     attr(deny(warnings, rust_2018_idioms), allow(dead_code, unused_variables))
 ))]
 #![cfg_attr(docsrs, feature(doc_cfg))]
-#![cfg_attr(target_os = "solid-asp3", feature(solid_ext))]
+#![cfg_attr(target_os = "solid_asp3", feature(solid_ext))]
 
 //! A runtime for writing reliable network applications without compromising speed.
 //!

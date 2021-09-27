@@ -245,7 +245,7 @@ impl TcpStream {
                 .map(|raw_socket| unsafe { std::net::TcpStream::from_raw_socket(raw_socket) })
         }
 
-        #[cfg(target_os = "solid-asp3")]
+        #[cfg(target_os = "solid_asp3")]
         {
             use std::os::solid::io::{FromRawFd, IntoRawFd};
             self.io
@@ -1109,7 +1109,7 @@ impl TcpStream {
             unsafe { mio::net::TcpSocket::from_raw_fd(self.as_raw_fd()) }
         }
 
-        #[cfg(target_os = "solid-asp3")]
+        #[cfg(target_os = "solid_asp3")]
         {
             use std::os::solid::io::{AsRawFd, FromRawFd};
             unsafe { mio::net::TcpSocket::from_raw_fd(self.as_raw_fd()) }
@@ -1295,7 +1295,7 @@ mod sys {
     }
 }
 
-#[cfg(target_os = "solid-asp3")]
+#[cfg(target_os = "solid_asp3")]
 mod sys {
     use super::TcpStream;
     use std::os::solid::prelude::*;
