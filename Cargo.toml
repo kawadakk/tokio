@@ -16,5 +16,5 @@ members = [
 ]
 
 [patch.crates-io]
-socket2 = { git = "https://github.com/kawadakk/socket2", branch = "feat-solid-support" }
-mio = { git = "https://github.com/kawadakk/mio", branch = "feat-solid-support-v0.7.x" }
+mio = { git = "https://github.com/solid-rs/mio", branch = "feat-solid-support-0.7" }
+socket2 = { git = "https://github.com/solid-rs/socket2", branch = "feat-solid-support-0.4" }
