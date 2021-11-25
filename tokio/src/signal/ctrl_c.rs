@@ -1,3 +1,5 @@
+#[cfg(not(any(unix, windows)))]
+use super::noop::{self as os_impl};
 #[cfg(unix)]
 use super::unix::{self as os_impl};
 #[cfg(windows)]
