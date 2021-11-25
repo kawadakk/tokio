@@ -47,9 +47,7 @@ impl Future for Child {
 #[derive(Debug)]
 pub(crate) enum NeverSource {}
 
-pub(crate) type ChildStdin = PollEvented<NeverSource>;
-pub(crate) type ChildStdout = PollEvented<NeverSource>;
-pub(crate) type ChildStderr = PollEvented<NeverSource>;
+pub(crate) type ChildStdio = PollEvented<NeverSource>;
 
 impl mio::event::Source for NeverSource {
     fn register(&mut self, _: &mio::Registry, _: mio::Token, _: mio::Interest) -> io::Result<()> {
@@ -82,4 +80,8 @@ impl std::io::Write for &NeverSource {
 pub(crate) fn convert_to_stdio(io: PollEvented<NeverSource>) -> io::Result<Stdio> {
     let source: &NeverSource = &io;
     match *source {}
+}
+
+pub(super) fn stdio<T>(_: T) -> io::Result<ChildStdio> {
+    unimplemented!()
 }
