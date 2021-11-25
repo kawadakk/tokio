@@ -21,6 +21,7 @@
 #![cfg_attr(docsrs, doc(cfg_hide(loom)))]
 #![cfg_attr(docsrs, doc(cfg_hide(not(loom))))]
 #![cfg_attr(docsrs, allow(unused_attributes))]
+#![cfg_attr(target_os = "solid_asp3", feature(solid_ext))]
 
 //! A runtime for writing reliable network applications without compromising speed.
 //!

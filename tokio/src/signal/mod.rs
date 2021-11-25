@@ -56,8 +56,12 @@ mod os {
 
     #[cfg(windows)]
     pub(crate) use super::windows::{OsExtraData, OsStorage};
+
+    #[cfg(not(any(unix, windows)))]
+    pub(crate) use super::noop::{OsExtraData, OsStorage};
 }
 
+mod noop;
 pub mod unix;
 pub mod windows;
 

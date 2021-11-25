@@ -187,6 +187,10 @@ pub(crate) mod unix {
 #[cfg(windows)]
 mod imp;
 
+#[path = "unsupported.rs"]
+#[cfg(not(any(unix, windows)))]
+mod imp;
+
 mod kill;
 
 use crate::io::{AsyncRead, AsyncWrite, ReadBuf};

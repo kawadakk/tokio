@@ -251,6 +251,15 @@ impl UdpSocket {
                 .map(|io| io.into_raw_socket())
                 .map(|raw_socket| unsafe { std::net::UdpSocket::from_raw_socket(raw_socket) })
         }
+
+        #[cfg(target_os = "solid_asp3")]
+        {
+            use std::os::solid::io::{FromRawFd, IntoRawFd};
+            self.io
+                .into_inner()
+                .map(|io| io.into_raw_fd())
+                .map(|raw_fd| unsafe { std::net::UdpSocket::from_raw_fd(raw_fd) })
+        }
     }
 
     /// Returns the local address that this socket is bound to.
@@ -1560,10 +1569,22 @@ impl fmt::Debug for UdpSocket {
     }
 }
 
-#[cfg(all(unix))]
+#[cfg(any(unix))]
 mod sys {
     use super::UdpSocket;
     use std::os::unix::prelude::*;
+
+    impl AsRawFd for UdpSocket {
+        fn as_raw_fd(&self) -> RawFd {
+            self.io.as_raw_fd()
+        }
+    }
+}
+
+#[cfg(target_os = "solid_asp3")]
+mod sys {
+    use super::UdpSocket;
+    use std::os::solid::prelude::*;
 
     impl AsRawFd for UdpSocket {
         fn as_raw_fd(&self) -> RawFd {

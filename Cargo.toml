@@ -14,3 +14,7 @@ members = [
   "tests-build",
   "tests-integration",
 ]
+
+[patch.crates-io]
+mio = { git = "https://github.com/solid-rs/mio", branch = "feat-solid-support-0.7" }
+socket2 = { git = "https://github.com/solid-rs/socket2", branch = "feat-solid-support-0.4" }
