@@ -500,6 +500,10 @@ impl TcpSocket {
             if err.kind() != io::ErrorKind::WouldBlock {
                 return Err(err);
             }
+            #[cfg(target_os = "solid_asp3")]
+            if err.kind() != io::ErrorKind::WouldBlock {
+                return Err(err);
+            }
         }
         #[cfg(unix)]
         let mio = {
@@ -515,6 +519,14 @@ impl TcpSocket {
 
             let raw_socket = self.inner.into_raw_socket();
             unsafe { mio::net::TcpStream::from_raw_socket(raw_socket) }
+        };
+
+        #[cfg(target_os = "solid_asp3")]
+        let mio = {
+            use std::os::solid::io::{FromRawFd, IntoRawFd};
+
+            let raw_fd = self.inner.into_raw_fd();
+            unsafe { mio::net::TcpStream::from_raw_fd(raw_fd) }
         };
 
         TcpStream::connect_mio(mio).await
@@ -571,6 +583,14 @@ impl TcpSocket {
 
             let raw_socket = self.inner.into_raw_socket();
             unsafe { mio::net::TcpListener::from_raw_socket(raw_socket) }
+        };
+
+        #[cfg(target_os = "solid_asp3")]
+        let mio = {
+            use std::os::solid::io::{FromRawFd, IntoRawFd};
+
+            let raw_fd = self.inner.into_raw_fd();
+            unsafe { mio::net::TcpListener::from_raw_fd(raw_fd) }
         };
 
         TcpListener::new(mio)
