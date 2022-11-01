@@ -1,6 +1,6 @@
 //! Process handling for platforms that don't support spawning processes.
 
-use crate::io::PollEvented;
+use crate::io::{AsyncRead, AsyncWrite, ReadBuf};
 use crate::process::kill::Kill;
 use crate::process::SpawnedChild;
 
@@ -45,41 +45,38 @@ impl Future for Child {
 }
 
 #[derive(Debug)]
-pub(crate) enum NeverSource {}
+pub(crate) enum ChildStdio {}
 
-pub(crate) type ChildStdio = PollEvented<NeverSource>;
-
-impl mio::event::Source for NeverSource {
-    fn register(&mut self, _: &mio::Registry, _: mio::Token, _: mio::Interest) -> io::Result<()> {
+impl AsyncWrite for ChildStdio {
+    fn poll_write(
+        self: Pin<&mut Self>,
+        _cx: &mut Context<'_>,
+        _buf: &[u8],
+    ) -> Poll<io::Result<usize>> {
         match *self {}
     }
-    fn reregister(&mut self, _: &mio::Registry, _: mio::Token, _: mio::Interest) -> io::Result<()> {
+
+    fn poll_flush(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<io::Result<()>> {
         match *self {}
     }
-    fn deregister(&mut self, _: &mio::Registry) -> io::Result<()> {
+
+    fn poll_shutdown(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<io::Result<()>> {
         match *self {}
     }
 }
 
-impl std::io::Read for &NeverSource {
-    fn read(&mut self, _: &mut [u8]) -> io::Result<usize> {
-        match **self {}
+impl AsyncRead for ChildStdio {
+    fn poll_read(
+        self: Pin<&mut Self>,
+        _cx: &mut Context<'_>,
+        _buf: &mut ReadBuf<'_>,
+    ) -> Poll<io::Result<()>> {
+        match *self {}
     }
 }
 
-impl std::io::Write for &NeverSource {
-    fn write(&mut self, _: &[u8]) -> io::Result<usize> {
-        match **self {}
-    }
-
-    fn flush(&mut self) -> io::Result<()> {
-        match **self {}
-    }
-}
-
-pub(crate) fn convert_to_stdio(io: PollEvented<NeverSource>) -> io::Result<Stdio> {
-    let source: &NeverSource = &io;
-    match *source {}
+pub(crate) fn convert_to_stdio(io: ChildStdio) -> io::Result<Stdio> {
+    match io {}
 }
 
 pub(super) fn stdio<T>(_: T) -> io::Result<ChildStdio> {
