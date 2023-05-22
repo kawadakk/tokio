@@ -6,11 +6,17 @@ use std::net::SocketAddr;
 
 #[cfg(target_os = "solid_asp3")]
 use std::os::solid::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
+#[cfg(all(unix, not(tokio_no_as_fd)))]
+use std::os::unix::io::{AsFd, BorrowedFd};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
-#[cfg(windows)]
-use std::os::windows::io::{AsRawSocket, FromRawSocket, IntoRawSocket, RawSocket};
 use std::time::Duration;
+
+cfg_windows! {
+    use crate::os::windows::io::{AsRawSocket, FromRawSocket, IntoRawSocket, RawSocket};
+    #[cfg(not(tokio_no_as_fd))]
+    use crate::os::windows::io::{AsSocket, BorrowedSocket};
+}
 
 cfg_net! {
     /// A TCP socket that has not yet been converted to a `TcpStream` or
@@ -767,6 +773,13 @@ impl AsRawFd for TcpSocket {
     }
 }
 
+#[cfg(all(unix, not(tokio_no_as_fd)))]
+impl AsFd for TcpSocket {
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
+    }
+}
+
 #[cfg(any(unix, target_os = "solid_asp3"))]
 impl FromRawFd for TcpSocket {
     /// Converts a `RawFd` to a `TcpSocket`.
@@ -788,30 +801,36 @@ impl IntoRawFd for TcpSocket {
     }
 }
 
-#[cfg(windows)]
-impl IntoRawSocket for TcpSocket {
-    fn into_raw_socket(self) -> RawSocket {
-        self.inner.into_raw_socket()
+cfg_windows! {
+    impl IntoRawSocket for TcpSocket {
+        fn into_raw_socket(self) -> RawSocket {
+            self.inner.into_raw_socket()
+        }
     }
-}
 
-#[cfg(windows)]
-impl AsRawSocket for TcpSocket {
-    fn as_raw_socket(&self) -> RawSocket {
-        self.inner.as_raw_socket()
+    impl AsRawSocket for TcpSocket {
+        fn as_raw_socket(&self) -> RawSocket {
+            self.inner.as_raw_socket()
+        }
     }
-}
 
-#[cfg(windows)]
-impl FromRawSocket for TcpSocket {
-    /// Converts a `RawSocket` to a `TcpStream`.
-    ///
-    /// # Notes
-    ///
-    /// The caller is responsible for ensuring that the socket is in
-    /// non-blocking mode.
-    unsafe fn from_raw_socket(socket: RawSocket) -> TcpSocket {
-        let inner = socket2::Socket::from_raw_socket(socket);
-        TcpSocket { inner }
+    #[cfg(not(tokio_no_as_fd))]
+    impl AsSocket for TcpSocket {
+        fn as_socket(&self) -> BorrowedSocket<'_> {
+            unsafe { BorrowedSocket::borrow_raw(self.as_raw_socket()) }
+        }
+    }
+
+    impl FromRawSocket for TcpSocket {
+        /// Converts a `RawSocket` to a `TcpStream`.
+        ///
+        /// # Notes
+        ///
+        /// The caller is responsible for ensuring that the socket is in
+        /// non-blocking mode.
+        unsafe fn from_raw_socket(socket: RawSocket) -> TcpSocket {
+            let inner = socket2::Socket::from_raw_socket(socket);
+            TcpSocket { inner }
+        }
     }
 }
