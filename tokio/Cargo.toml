@@ -6,7 +6,7 @@ name = "tokio"
 #   - README.md
 # - Update CHANGELOG.md.
 # - Create "v1.x.y" git tag.
-version = "1.28.2"
+version = "1.29.0"
 edition = "2021"
 rust-version = "1.56"
 authors = ["Tokio Contributors <team@tokio.rs>"]
@@ -99,11 +99,11 @@ autocfg = "1.1"
 [dependencies]
 tokio-macros = { version = "~2.1.0", path = "../tokio-macros", optional = true }
 
-pin-project-lite = "0.2.0"
+pin-project-lite = "0.2.7"
 
 # Everything else is optional...
 bytes = { version = "1.0.0", optional = true }
-mio = { version = "0.8.4", optional = true, default-features = false }
+mio = { version = "0.8.6", optional = true, default-features = false }
 num_cpus = { version = "1.8.0", optional = true }
 parking_lot = { version = "0.12.0", optional = true }
 
@@ -115,19 +115,24 @@ socket2 = { version = "0.4.9", optional = true, features = [ "all" ] }
 [target.'cfg(tokio_unstable)'.dependencies]
 tracing = { version = "0.1.25", default-features = false, features = ["std"], optional = true } # Not in full
 
+# Currently unstable. The API exposed by these features may be broken at any time.
+# Requires `--cfg tokio_unstable` to enable.
+[target.'cfg(tokio_taskdump)'.dependencies]
+backtrace = { version = "0.3.58" }
+
 [target.'cfg(unix)'.dependencies]
-libc = { version = "0.2.42", optional = true }
+libc = { version = "0.2.145", optional = true }
 signal-hook-registry = { version = "1.1.1", optional = true }
 
 [target.'cfg(unix)'.dev-dependencies]
-libc = { version = "0.2.42" }
+libc = { version = "0.2.145" }
 nix = { version = "0.26", default-features = false, features = ["fs", "socket"] }
 
 [target.'cfg(windows)'.dependencies.windows-sys]
 version = "0.48"
 optional = true
 
-[target.'cfg(docsrs)'.dependencies.windows-sys]
+[target.'cfg(windows)'.dev-dependencies.windows-sys]
 version = "0.48"
 features = [
     "Win32_Foundation",
