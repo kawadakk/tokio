@@ -1864,7 +1864,7 @@ impl UdpSocket {
     /// Windows Server 2012+.](https://docs.microsoft.com/en-us/windows/win32/winsock/ipproto-ip-socket-options)
     ///
     /// [`set_tos`]: Self::set_tos
-    // https://docs.rs/socket2/0.4.2/src/socket2/socket.rs.html#1178
+    // https://docs.rs/socket2/0.5.3/src/socket2/socket.rs.html#1464
     #[cfg(not(any(
         target_os = "fuchsia",
         target_os = "redox",
@@ -1891,7 +1891,7 @@ impl UdpSocket {
     ///
     /// **NOTE:** On Windows, `IP_TOS` is only supported on [Windows 8+ or
     /// Windows Server 2012+.](https://docs.microsoft.com/en-us/windows/win32/winsock/ipproto-ip-socket-options)
-    // https://docs.rs/socket2/0.4.2/src/socket2/socket.rs.html#1178
+    // https://docs.rs/socket2/0.5.3/src/socket2/socket.rs.html#1446
     #[cfg(not(any(
         target_os = "fuchsia",
         target_os = "redox",
@@ -1930,7 +1930,7 @@ impl UdpSocket {
     /// works for some socket types, particularly `AF_INET` sockets.
     ///
     /// If `interface` is `None` or an empty string it removes the binding.
-    #[cfg(all(any(target_os = "android", target_os = "fuchsia", target_os = "linux")))]
+    #[cfg(any(target_os = "android", target_os = "fuchsia", target_os = "linux"))]
     #[cfg_attr(
         docsrs,
         doc(cfg(all(any(target_os = "android", target_os = "fuchsia", target_os = "linux"))))
@@ -2030,7 +2030,6 @@ mod sys {
         }
     }
 
-    #[cfg(not(tokio_no_as_fd))]
     impl AsFd for UdpSocket {
         fn as_fd(&self) -> BorrowedFd<'_> {
             unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
@@ -2052,7 +2051,6 @@ mod sys {
 
 cfg_windows! {
     use crate::os::windows::io::{AsRawSocket, RawSocket};
-    #[cfg(not(tokio_no_as_fd))]
     use crate::os::windows::io::{AsSocket, BorrowedSocket};
 
     impl AsRawSocket for UdpSocket {
@@ -2061,7 +2059,6 @@ cfg_windows! {
         }
     }
 
-    #[cfg(not(tokio_no_as_fd))]
     impl AsSocket for UdpSocket {
         fn as_socket(&self) -> BorrowedSocket<'_> {
             unsafe { BorrowedSocket::borrow_raw(self.as_raw_socket()) }

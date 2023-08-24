@@ -158,7 +158,7 @@ pub(crate) struct Shared {
     idle: Idle,
 
     /// Collection of all active tasks spawned onto this executor.
-    pub(super) owned: OwnedTasks<Arc<Handle>>,
+    pub(crate) owned: OwnedTasks<Arc<Handle>>,
 
     /// Data synchronized by the scheduler mutex
     pub(super) synced: Mutex<Synced>,
@@ -787,6 +787,10 @@ impl Core {
                 cap,
             );
 
+            // Take at least one task since the first task is returned directly
+            // and nto pushed onto the local queue.
+            let n = usize::max(1, n);
+
             let mut synced = worker.handle.shared.synced.lock();
             // safety: passing in the correct `inject::Synced`.
             let mut tasks = unsafe { worker.inject().pop_n(&mut synced.inject, n) };
@@ -1022,6 +1026,12 @@ impl Handle {
             self.push_remote_task(task);
             self.notify_parked_remote();
         })
+    }
+
+    pub(super) fn schedule_option_task_without_yield(&self, task: Option<Notified>) {
+        if let Some(task) = task {
+            self.schedule_task(task, false);
+        }
     }
 
     fn schedule_local(&self, core: &mut Core, task: Notified, is_yield: bool) {
