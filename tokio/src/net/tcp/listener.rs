@@ -423,6 +423,24 @@ mod sys {
     }
 }
 
+#[cfg(target_os = "solid_asp3")]
+mod sys {
+    use super::TcpListener;
+    use std::os::solid::prelude::*;
+
+    impl AsRawFd for TcpListener {
+        fn as_raw_fd(&self) -> RawFd {
+            self.io.as_raw_fd()
+        }
+    }
+
+    impl AsFd for TcpListener {
+        fn as_fd(&self) -> BorrowedFd<'_> {
+            unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
+        }
+    }
+}
+
 cfg_unstable! {
     #[cfg(target_os = "wasi")]
     mod sys {
