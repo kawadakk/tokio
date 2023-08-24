@@ -5,7 +5,7 @@ use std::io;
 use std::net::SocketAddr;
 
 #[cfg(target_os = "solid_asp3")]
-use std::os::solid::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
+use std::os::solid::io::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, RawFd};
 #[cfg(unix)]
 use std::os::unix::io::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, RawFd};
 use std::time::Duration;
@@ -814,7 +814,7 @@ impl AsRawFd for TcpSocket {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "solid_asp3"))]
 impl AsFd for TcpSocket {
     fn as_fd(&self) -> BorrowedFd<'_> {
         unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }

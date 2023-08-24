@@ -2047,6 +2047,12 @@ mod sys {
             self.io.as_raw_fd()
         }
     }
+
+    impl AsFd for UdpSocket {
+        fn as_fd(&self) -> BorrowedFd<'_> {
+            unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
+        }
+    }
 }
 
 cfg_windows! {
